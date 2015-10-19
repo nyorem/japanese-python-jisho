@@ -1,2 +1,3 @@
 # python-jisho
-A simple python module to lookup jisho.org
+
+Returns a dict with results that you can more easily parse
