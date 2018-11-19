@@ -1,6 +1,7 @@
 #! /usr/bin/env python3
 
 import sys
+sys.path.append(".")
 from jisho import get_english_translations, lookup, get_kanji_translations
 
 space = "　"
@@ -16,9 +17,11 @@ if __name__ == "__main__":
     contents = read_file(fname)
     translation = []
     for line in contents:
-        if len(line) == 0: # empty lines
+        if len(line) == 0: # Empty lines
             translated = line
-        elif len(line) >= 1 and line[0] == "#": # Title lines
+        elif len(line) >= 1 and line[0] == "#": # Comments
+            translated = line
+        elif "/" in line: # Translation already exists
             translated = line
         else:
             if len(line) >= 1:
@@ -35,7 +38,7 @@ if __name__ == "__main__":
                     kanji_translations = get_kanji_translations(results)
                 elements.insert(len(elements), english)
                 translated = " / ".join(elements)
-                if kanji_translations is not None:
+                if (kanji_translations is not None) and (len(kanji_translations) > 1):
                     kanji = " + ".join(kanji_translations)
                     translated += " => " + kanji
                 # print(translated)
