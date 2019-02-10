@@ -5,14 +5,12 @@ import requests
 import sys
 
 def lookup(query):
-
     data = json.loads(requests.get(
             "http://jisho.org/api/v1/search/words?keyword=%s" % query).text)
 
     results = {}
 
     for result in range(len(data["data"])):
-
         results[result] = {"readings": [], "words": [], "senses": {}}
 
         for a in range(len(data["data"][result]["japanese"])):
@@ -38,9 +36,12 @@ def lookup(query):
     return results
 
 def get_english_translations(results):
-    senses = results[0]["senses"]
-    a = senses[0]["english"][:2]
-    return a
+    try:
+        senses = results[0]["senses"]
+        ret = senses[0]["english"][:2]
+    except KeyError:
+        ret = None
+    return ret
 
 # Remove non-kanji characters in a string
 # see: https://stackoverflow.com/questions/33338713/filtering-out-all-non-kanji-characters-in-a-text-with-python-3
@@ -67,7 +68,10 @@ def get_kanji_translations(results):
     translations = []
     for kanji in extract_kanji(results[0]["words"][0]):
         t = get_english_translations(lookup(kanji))
-        translations.append(t[0])
+        if t is None:
+            translations.append(None)
+        else:
+            translations.append(t[0])
     return translations
 
 if __name__ == "__main__":
